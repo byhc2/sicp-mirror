@@ -1,0 +1,42 @@
+\documentclass{ctexart}
+\usepackage{amsmath}
+\date{} %不输出日期
+\title{}
+\author{}
+\begin{document}
+\maketitle
+
+%{\em 证明}
+
+\noindent 据提示算得$\phi=\frac{1+\sqrt{5}}{2}$，$\gamma=\frac{1+\sqrt{5}}{2}$
+
+\noindent 易证$\phi^2=\phi+1$，$\gamma^2=\gamma+1$
+
+\noindent 分别算$Fib(0)$，$Fib(1)$，$Fib(2)$，可知其符合等式
+\begin{equation}
+Fib(n)=\frac{(\phi^n-\gamma^n)}{\sqrt{5}}\label{tx}
+\end{equation}
+据归纳法，设$Fib(k) (k>=2)$符合等式\ref{tx}
+\begin{equation}
+\begin{aligned}
+Fib(k + 1)&=Fib(k)+Fib(k+1) \\
+	&=\frac{(\phi^k-\gamma^k)}{\sqrt{5}} + \frac{(\phi^{k-1}-\gamma^{k-1})}{\sqrt{5}} \\
+	&=\frac{1}{\sqrt{5}}\left(\phi^k+\phi^{k-1}-\gamma^k-\gamma^{k-1}\right) \\
+	&=\frac{1}{\sqrt{5}}\left[\phi^{k-1}\left(\phi+1\right)-\gamma^{k-1}\left(\gamma+1\right)\right] \\
+	&=\frac{1}{\sqrt{5}}\left(\phi^{k+1}-\gamma^{k+1}\right)
+\end{aligned}
+\end{equation}
+
+\noindent 因此
+\begin{equation}
+\frac{1}{\sqrt{5}}\phi^n=Fib(n)+\frac{1}{\sqrt{5}}\gamma^n
+\end{equation}
+
+\noindent 易算得
+\begin{equation}
+-\frac{1}{2}<\frac{1}{\sqrt{5}}\gamma^n<\frac{1}{2}
+\end{equation}
+
+\noindent 故$Fib(n)$是距离$\frac{1}{\sqrt{5}}\phi^n$最近的整数，相差小于$0.5$
+
+\end{document}
