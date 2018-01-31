@@ -1,0 +1,38 @@
+\documentclass{ctexart}
+\usepackage{amsmath}
+\date{} %不输出日期
+\title{}
+\author{}
+\begin{document}
+\maketitle
+
+\noindent 立$(a_i,b_i)$为应用$i$次$T_{pq}$之结果，则
+
+\begin{equation}
+\begin{aligned}
+a_1&=b_0q+a_0q+a_0p \\
+b_1&=b_0p+a_0q \\
+a_2&=b_1q+a_1q+a_1p \\
+b_2&=b_1p+a_1q
+\end{aligned}
+\end{equation}
+
+\noindent 上述四式消去$(a_1, b_1)$得
+\begin{equation}
+\begin{aligned}
+a_2&=b_0q^{\prime}+a_0q^{\prime}+a_0p^{\prime} \\
+b_2&=b_0p^{\prime}+a_0q^{\prime}
+\end{aligned}
+\end{equation}
+
+\noindent 其中
+\begin{equation}
+\begin{aligned}
+p^{\prime}&=p^2+q^2 \\
+q^{\prime}&=2pq+q^2
+\end{aligned}
+\end{equation}
+
+\noindent 据此可完成题中代码
+
+\end{document}
