@@ -48,6 +48,8 @@
   (cc n 5 0)
   )
 
-(count-change 8)
+(count-change 3)
 ;(display (count-change 11))
 (newline)
+
+; 暂不能算出复杂度
