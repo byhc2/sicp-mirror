@@ -1,4 +1,3 @@
-
 #!/usr/bin/guile
 !#
 
@@ -35,9 +34,7 @@
   (lambda (f) (lambda (x) (f (f x))))
   )
 
-; (plus 2 3)
-; (lambda (f) ())
-
+; //此处尚不明就里 TODO
 (define (plus a b)
   (lambda (f) (lambda (x) ((b f) ((a f) x))))
   )
