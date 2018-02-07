@@ -68,6 +68,7 @@
     )
   )
 
+; 习题2.10
 (define (div-interval x y)
   (if (and (<= (lowwer-bound y) 0) (<= 0 (upper-bound y)))
     (error "divisor cross zero")
@@ -218,6 +219,7 @@
 	 )
 (newline)
 
+; 习题2.14
 ; 习题2.15
 ; 习题2.16
 ; 立两电阻并联，每个电阻变动在0.95到1.05欧姆
