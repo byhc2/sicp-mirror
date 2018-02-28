@@ -42,3 +42,11 @@
 
 (display (zero? (make-complex-from-real-imag 0 0)))
 (newline)
+
+(display "====================")
+(newline)
+(display (add 2 (make-rat 2 5)))
+;(display ((get-coercion 'scheme-number 'rational) 1))
+;(newline)
+;(display (type-tag (make-rat 2 5)))
+(newline)

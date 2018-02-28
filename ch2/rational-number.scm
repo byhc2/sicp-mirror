@@ -44,6 +44,8 @@
   (put 'mul '(rational rational) (lambda (x y) (tag (mul-rat x y))))
   (put 'div '(rational rational) (lambda (x y) (tag (div-rat x y))))
   (put 'equ? '(rational rational) (lambda (x y) (equ?-rat x y)))
+  (put 'denom '(rational) (lambda (x) (denom x)))
+  (put 'numer '(rational) (lambda (x) (numer x)))
   (put 'make 'rational (lambda (n d) (tag (make-rat n d)))))
 
 (define (make-rat n d)

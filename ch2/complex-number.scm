@@ -109,6 +109,9 @@
   (put 'equ? '(complex complex) (lambda (z1 z2) (equ?-complex z1 z2)))
   (put 'zero? '(complex) (lambda (z) (zero? z)))
   (put 'mag '(complex) mag)
+  (put 'ang '(complex) ang)
+  (put 'rpart '(complex) rpart)
+  (put 'ipart '(complex) ipart)
   (put 'make-from-real-imag 'complex
        (lambda (x y) (tag (make-from-real-imag x y))))
   (put 'make-from-mag-ang 'complex
