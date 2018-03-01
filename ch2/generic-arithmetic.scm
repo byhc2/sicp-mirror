@@ -7,6 +7,8 @@
                               rpart mag ang numer
                               denom make-rat project
                               apply-generic trans-type
+                              make-polynomial
+                              term-list
                               make-complex-from-real-imag
                               make-complex-from-mag-ang))
 
@@ -15,10 +17,12 @@
 (load "complex-number.scm")
 (load "rational-number.scm")
 (load "scheme-number.scm")
+(load "poly.scm")
 
 (install-scheme-number-package)
 (install-rational-number-package)
 (install-complex-number-package)
+(install-polynomial-package)
 
 ; 习题2.82
 (define (can-coercion target-type type-tags)
@@ -144,3 +148,6 @@
 (define (cosine x) (apply-generic 'cosine x))
 ; 暂只处理加法减法，乘除暂不能
 ; 因需重定义sqrt处理有理数
+
+
+(define (term-list p) (apply-generic 'term-list p))
