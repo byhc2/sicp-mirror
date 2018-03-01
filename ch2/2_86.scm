@@ -1,20 +1,12 @@
 #!/usr/bin/guile
 !#
 
-; 习题2.86
-
 (add-to-load-path ".")
 (use-modules (generic-arithmetic))
-(use-modules (scheme-number))
-(use-modules (rational-number))
-(use-modules (complex-number))
-
-(install-scheme-number-package)
-(install-rational-number-package)
-(install-complex-number-package)
 
 (define var1 (make-complex-from-real-imag 2 0))
-(define var2 (make-rat 2 1))
+(define var2 (make-rat 3 1))
+(define var3 (make-rat 1 2))
 
 ;(display (drop (make-complex-from-real-imag 2 0)))
 ;(display (numer (make-complex-from-real-imag 2 0)) 2)
@@ -28,5 +20,28 @@
 (newline)
 ;(display (get 'numer '(complex)))
 (newline)
-(display (drop var1))
+;(display (drop var1))
+(newline)
+;(display (drop var2))
+(newline)
+;(display (denom var2))
+;(display (drop 1))
+;(display (add var1 var2))
+;(display (trans-type 'complex var2))
+;(display (add var3 var3))
+(define var4 (make-complex-from-real-imag (make-rat 1 2) 1))
+(define var5 (make-complex-from-real-imag (make-rat 7 2) 1))
+;(display var4)
+(newline)
+;(display (rpart var4))
+;(display (add var4 var4))
+;(define var5 (make-complex-from-real-imag 0 0))
+;(display (zero? var5))
+;(display (sine var3))
+(newline)
+;(display (cosine var3))
+(newline)
+;(display (mul var4 var5))
+;(display (equ? var1 5))
+;(display (equ? 2 4))
 (newline)

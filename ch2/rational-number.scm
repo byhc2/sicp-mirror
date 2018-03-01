@@ -1,12 +1,11 @@
 #!/usr/bin/guile
 !#
 
-(define-module (rational-number)
-               #: export (install-rational-number-package
-                           make-rat))
-
-(add-to-load-path ".")
-(use-modules (generic-arithmetic))
+;(define-module (rational-number)
+;               #: export (install-rational-number-package))
+;
+;(add-to-load-path ".")
+;(use-modules (environ))
 
 (define (install-rational-number-package)
   (define (numer x) (car x))
@@ -46,7 +45,6 @@
   (put 'equ? '(rational rational) (lambda (x y) (equ?-rat x y)))
   (put 'denom '(rational) (lambda (x) (denom x)))
   (put 'numer '(rational) (lambda (x) (numer x)))
+  (put 'sine '(rational) (lambda (x) (tag (sine (div (numer x) (denom x))))))
+  (put 'cosine '(rational) (lambda (x) (tag (cosine (div (numer x) (denom x))))))
   (put 'make 'rational (lambda (n d) (tag (make-rat n d)))))
-
-(define (make-rat n d)
-  ((get 'make 'rational) n d))

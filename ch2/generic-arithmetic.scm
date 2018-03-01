@@ -2,45 +2,23 @@
 !#
 
 (define-module (generic-arithmetic)
-               #: export (get put type-tag attach-tag
-                              contents apply-generic
-                              add sub mul div equ?
-                              zero? get-coercion
-                              put-coercion drop
-                              ipart rpart mag ang
-                              numer denom
-                              
-                              coercion-util can-coercion))
+               #: export (add sub mul div equ? sine
+                              zero?  ipart drop cosine
+                              rpart mag ang numer
+                              denom make-rat project
+                              apply-generic trans-type
+                              make-complex-from-real-imag
+                              make-complex-from-mag-ang))
 
-(define *op-table* (make-hash-table))
-(define (get op type-tags)
-  (hash-ref *op-table* (list op type-tags)))
-(define (put op type-tags proc)
-  (hash-set! *op-table* (list op type-tags) proc))
+(add-to-load-path ".")
+(load "environ.scm")
+(load "complex-number.scm")
+(load "rational-number.scm")
+(load "scheme-number.scm")
 
-;; 类型转换
-(define *type-trans-table* (make-hash-table))
-(define (get-coercion t1 t2)
-  (hash-ref *type-trans-table* (list t1 t2)))
-(define (put-coercion t1 t2 f)
-  (hash-set! *type-trans-table* (list t1 t2) f))
-
-; 习题2.78
-; 此处对type-tag attach-tag contents的改动
-; 几类C++模板对原始类型之偏特化
-(define (type-tag datum)
-  (cond ((number? datum) 'scheme-number)
-    ((pair? datum) (car datum))
-    (else (error "bad tagged datum -- TYPE-TAG" datum))))
-
-(define (attach-tag type-tag contents)
-  (cond ((number? contents) contents)
-    (else (cons type-tag contents))))
-
-(define (contents datum)
-  (cond ((number? datum) datum)
-    ((pair? datum) (cdr datum))
-    (else (error "bad tagged datum -- CONTENTS" datum))))
+(install-scheme-number-package)
+(install-rational-number-package)
+(install-complex-number-package)
 
 ; 习题2.82
 (define (can-coercion target-type type-tags)
@@ -63,14 +41,14 @@
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
       (if proc
-          (apply proc (map contents args))
+          (drop (apply proc (map contents args)))
           (let ((target-type (coercion-util (car type-tags)
                                             '()
                                             (cdr type-tags))))
             (if target-type
-                (apply apply-generic
-                       op
-                       (map (lambda (a) (trans-type target-type a)) args))
+                (drop (apply apply-generic
+                             op
+                             (map (lambda (a) (trans-type target-type a)) args)))
                 (error "类型不能对齐 -- APPLY-GENERIC" type-tags)))))))
 
 (define (apply-generic2 op . args)
@@ -91,7 +69,20 @@
                         (t2->t1 (apply-generic2 op a1 (t2->t1 a2)))
                         (else (error "参数类型不兼容 -- APPLY-GENERIC"
                                      type-tags)))))
-                (error "参数个数非2 -- APPLY-GENERIC" type-tags)))))))
+                (error "参数个数非2 -- APPLY-GENERIC" type-tags))
+              (error "找不到对应操作 -- APPLY-GENERIC" (list op type-tags)))))))
+
+; 此时业已不需make-scheme-number
+(define (make-scheme-number n)
+  ((get 'make 'scheme-number) n))
+
+(define (make-rat n d)
+  ((get 'make 'rational) n d))
+
+(define (make-complex-from-real-imag x y)
+  ((get 'make-from-real-imag 'complex) x y))
+(define (make-complex-from-mag-ang r a)
+  ((get 'make-from-mag-ang 'complex) r a))
 
 ; 以下所有函数不做类型检查
 ; 若遇非其所用类型，则无限递归
@@ -114,6 +105,8 @@
               (lambda (x) (make-rat x 1)))
 (put-coercion 'scheme-number 'complex
               (lambda (x) (make-complex-from-real-imag x 0)))
+(put-coercion 'rational 'complex
+              (lambda (x) (make-complex-from-real-imag (div (numer x) (denom x)) 0)))
 
 
 ; 习题2.81
@@ -128,11 +121,14 @@
 
 ; 习题2.85
 (define (drop arg)
-  (let ((after-drop (project arg)))
-    (if (equ? arg after-drop)
-        (drop after-drop)
-        arg)))
-
+  (cond
+    ((or (eq? arg #t) (eq? arg #f)) arg)
+    (else (let ((after-drop (project arg)))
+            (if (equ? arg after-drop)
+                after-drop
+                (if (eq? (type-tag after-drop) 'scheme-number)
+                    arg
+                    (drop after-drop)))))))
 ; 复数->实数->整数
 ; 有理数->整数
 (define (project arg)
@@ -142,3 +138,9 @@
       ((eq? type 'rational) (if (equ? (denom arg) 1) (numer arg) arg))
       ((eq? type 'scheme-number) (round arg))
       (else (error "类型不能下降 -- PROJECT" type-tag)))))
+
+; 习题2.86
+(define (sine x) (apply-generic 'sine x))
+(define (cosine x) (apply-generic 'cosine x))
+; 暂只处理加法减法，乘除暂不能
+; 因需重定义sqrt处理有理数

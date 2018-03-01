@@ -1,35 +1,33 @@
 #!/usr/bin/guile
 !#
 
-(define-module (complex-number)
-               #: export (install-complex-number-package
-                           make-complex-from-real-imag
-                           make-complex-from-mag-ang))
+;(define-module (complex-number)
+;               #: export (install-complex-number-package))
+;
+;(add-to-load-path ".")
+;(use-modules (environ))
 
-(add-to-load-path ".")
-(use-modules (generic-arithmetic))
-
-(define (square x) (* x x))
+(define (square x) (apply-generic 'mul x x))
 
 (define (install-rectangular-package)
   (define (rpart z) (car z))
   (define (ipart z) (cdr z))
   (define (make-from-real-imag x y) (cons x y))
   (define (mag z)
-    (sqrt (+ (square (rpart z))
+    (sqrt (add (square (rpart z))
              (square (ipart z)))))
   (define (ang z) (atan (ipart z) (rpart z)))
 
   (define (equ? z1 z2)
-    (and (= (rpart z1) (rpart z2))
-         (= (ipart z1) (ipart z2))))
+    (and (apply-generic 'equ? (rpart z1) (rpart z2))
+         (apply-generic 'equ? (ipart z1) (ipart z2))))
 
   (define (zero? z)
-    (and (= (rpart z) 0)
-         (= (ipart z) 0)))
+    (and (apply-generic equ? (rpart z) 0)
+         (apply-generic equ? (ipart z) 0)))
 
   (define (make-from-mag-ang r a)
-    (cons (* r (cos a)) (* r (sin a))))
+    (cons (mul r (cosine a)) (* r (sine a))))
   (define (tag x) (attach-tag 'rectangular x))
   (begin
     (put 'rpart '(rectangular) rpart)
@@ -46,18 +44,18 @@
 (define (install-polar-package)
   (define (mag z) (car z))
   (define (ang z) (cdr z))
-  (define (rpart z) (* (mag z) (cos (ang z))))
-  (define (ipart z) (* (mag z) (sin (ang z))))
+  (define (rpart z) (mul (mag z) (cosine (ang z))))
+  (define (ipart z) (mul (mag z) (sine (ang z))))
   (define (equ? z1 z2)
-    (and (= (mag z1) (mag z2))
-         (= (ang z1) (ang z2))))
+    (and (apply-generic 'equ? (mag z1) (mag z2))
+         (apply-generic 'equ? (ang z1) (ang z2))))
 
   (define (zero? z)
-    (and (= (mag z) 0)
-         (= (ang z) 0)))
+    (and (apply-generic 'equ? (mag z) 0)
+         (apply-generic 'equ? (ang z) 0)))
 
   (define (make-from-real-imag x y)
-    (cons (sqrt (+ (square x) (square y))) (atan y x)))
+    (cons (sqrt (add (square x) (square y))) (atan y x)))
   (define (make-from-mag-ang r a) (cons r a))
   (define (tag x) (attach-tag 'polar x))
   (begin
@@ -84,17 +82,17 @@
   (define (ang z) (apply-generic 'ang z))
 
   (define (add-complex z1 z2)
-    (make-from-real-imag (+ (rpart z1) (rpart z2))
-                         (+ (ipart z1) (ipart z2))))
+    (make-from-real-imag (add (rpart z1) (rpart z2))
+                         (add (ipart z1) (ipart z2))))
   (define (sub-complex z1 z2)
-    (make-from-real-imag (- (rpart z1) (rpart z2))
-                         (- (ipart z1) (ipart z2))))
+    (make-from-real-imag (sub (rpart z1) (rpart z2))
+                         (sub (ipart z1) (ipart z2))))
   (define (mul-complex z1 z2)
-    (make-from-mag-ang (* (mag z1) (mag z2))
-                       (* (ang z1) (ang z2))))
+    (make-from-mag-ang (mul (mag z1) (mag z2))
+                       (mul (ang z1) (ang z2))))
   (define (div-complex z1 z2)
-    (make-from-mag-ang (/ (mag z1) (mag z2))
-                       (- (ang z1) (ang z2))))
+    (make-from-mag-ang (div (mag z1) (mag z2))
+                       (sub (ang z1) (ang z2))))
   (define (equ?-complex z1 z2)
     (apply-generic 'equ? z1 z2))
 
@@ -119,11 +117,6 @@
 
 (install-rectangular-package)
 (install-polar-package)
-
-(define (make-complex-from-real-imag x y)
-  ((get 'make-from-real-imag 'complex) x y))
-(define (make-complex-from-mag-ang r a)
-  ((get 'make-from-mag-ang 'complex) r a))
 
 ; 习题2.77
 ; 其实不止增加(put 'mag '(complex) mag)一行
