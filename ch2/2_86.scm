@@ -47,7 +47,7 @@
 (newline)
 
 (define var6 (make-polynomial 'x '((2 1) (1 2) (0 1))))
-(display var6)
+;(display var6)
 ;(display (add var6 var6))
 (display (term-list var6))
 (newline)

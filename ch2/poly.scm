@@ -77,8 +77,6 @@
   (define (term-list p) (cdr p))
   (define (tag p) (attach-tag 'polynomial p))
 
-  (put 'term-list 'polynomial (lambda (x) (term-list x)))
-
   (put 'add '(polynomial polynomial)
        (lambda (p1 p2) (tag (add-poly p1 p2))))
   (put 'mul '(polynomial polynomial)

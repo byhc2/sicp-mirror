@@ -42,17 +42,20 @@
       ((get-coercion (type-tag arg) type) arg)))
 
 (define (apply-generic op . args)
+  (drop (apply do-apply-generic op args)))
+
+(define (do-apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
       (if proc
-          (drop (apply proc (map contents args)))
+          (apply proc (map contents args))
           (let ((target-type (coercion-util (car type-tags)
                                             '()
                                             (cdr type-tags))))
             (if target-type
-                (drop (apply apply-generic
+                (apply do-apply-generic
                              op
-                             (map (lambda (a) (trans-type target-type a)) args)))
+                             (map (lambda (a) (trans-type target-type a)) args))
                 (error "类型不能对齐 -- APPLY-GENERIC" type-tags)))))))
 
 (define (apply-generic2 op . args)
@@ -141,13 +144,13 @@
       ((eq? type 'complex) (if (equ? (ipart arg) 0) (rpart arg) arg))
       ((eq? type 'rational) (if (equ? (denom arg) 1) (numer arg) arg))
       ((eq? type 'scheme-number) (round arg))
-      (else (error "类型不能下降 -- PROJECT" type-tag)))))
+      ((list? arg) arg)
+      (else (error "类型不能下降 -- PROJECT" type)))))
 
 ; 习题2.86
 (define (sine x) (apply-generic 'sine x))
 (define (cosine x) (apply-generic 'cosine x))
 ; 暂只处理加法减法，乘除暂不能
 ; 因需重定义sqrt处理有理数
-
 
 (define (term-list p) (apply-generic 'term-list p))
