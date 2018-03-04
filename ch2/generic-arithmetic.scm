@@ -8,7 +8,7 @@
                               denom make-rat project
                               apply-generic trans-type
                               make-polynomial
-                              term-list
+                              term-list neg
                               make-complex-from-real-imag
                               make-complex-from-mag-ang))
 
@@ -45,6 +45,10 @@
   (drop (apply do-apply-generic op args)))
 
 (define (do-apply-generic op . args)
+  (display op)
+  (display " ")
+  (display args)
+  (newline)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
       (if proc
@@ -56,7 +60,7 @@
                 (apply do-apply-generic
                              op
                              (map (lambda (a) (trans-type target-type a)) args))
-                (error "类型不能对齐 -- APPLY-GENERIC" type-tags)))))))
+                (error "类型不能对齐 -- APPLY-GENERIC" op type-tags)))))))
 
 (define (apply-generic2 op . args)
   (let ((type-tags (map type-tag args)))
@@ -91,6 +95,10 @@
 (define (make-complex-from-mag-ang r a)
   ((get 'make-from-mag-ang 'complex) r a))
 
+; 习题2.87
+(define (make-polynomial var terms)
+  ((get 'make 'polynomial) var terms))
+
 ; 以下所有函数不做类型检查
 ; 若遇非其所用类型，则无限递归
 (define (add x y) (apply-generic 'add x y))
@@ -107,6 +115,8 @@
 (define (equ? x y) (apply-generic 'equ? x y))
 ; 习题2.80
 (define (zero? x) (apply-generic 'zero? x))
+; 习题2.88
+(define (neg x) (apply-generic 'neg x))
 
 (put-coercion 'scheme-number 'rational
               (lambda (x) (make-rat x 1)))
@@ -134,7 +144,6 @@
             (if (equ? arg after-drop)
                 after-drop
                 (if (eq? (type-tag after-drop) 'scheme-number)
-                    arg
                     (drop after-drop)))))))
 ; 复数->实数->整数
 ; 有理数->整数
@@ -153,4 +162,4 @@
 ; 暂只处理加法减法，乘除暂不能
 ; 因需重定义sqrt处理有理数
 
-(define (term-list p) (apply-generic 'term-list p))
+;(define (term-list p) (apply-generic 'term-list p))
