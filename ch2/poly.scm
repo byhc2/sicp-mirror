@@ -3,18 +3,21 @@
 
 (add-to-load-path ".")
 
-(define (install-polynomial-package)
+; (poly-sparse x (2 2) (1 1) (0 1))
+(define (install-poly-sparse)
   (define (variable? x) (symbol? x))
   (define (same-variable? v1 v2)
     (and (variable? v1) (variable? v2) (eq? v1 v2)))
-
-  (define (=zero? arg)
-    (apply-generic 'zero? arg))
-
+  (define (zero? p)
+    (define (zero?-coeff c)
+      (cond ((null? c) #t)
+        (else (and (= (cadar c) 0)
+                   (zero?-coeff (cdr c))))))
+    (zero?-coeff (cddr p)))
   (define (adjoin-term term term-list)
     (if (zero? (coeff term))
-      term-list
-      (cons term term-list)))
+        term-list
+        (cons term term-list)))
 
   (define (add-terms L1 L2)
     (cond
@@ -31,46 +34,44 @@
                         (make-term (order t1)
                                    (add (coeff t1) (coeff t2)))
                         (add-terms (rest-terms L1) (rest-terms L2)))))))))
-
   (define (mul-terms L1 L2)
     (if (empty-termlist? L1)
-      (the-empty-termlist)
-      (add-terms (mul-term-by-all-terms (first-term L1) L2)
-                 (mul-terms (rest-terms L1) L2))))
-
+        (the-empty-termlist)
+        (add-terms (mul-term-by-all-terms (first-term L1) L2)
+                   (mul-terms (rest-terms L1) L2))))
   (define (mul-term-by-all-terms t1 L)
     (if (empty-termlist? L)
-      (the-empty-termlist)
-      (let ((t2 (first-term L)))
-        (adjoin-term (make-term (+ (order t1) (order t2))
-                                (mul (coeff t1) (coeff t2)))
-                     (mul-term-by-all-terms t1 (rest-terms L))))))
+        (the-empty-termlist)
+        (let ((t2 (first-term L)))
+          (adjoin-term (make-term (+ (order t1) (order t2))
+                                  (mul (coeff t1) (coeff t2)))
+                       (mul-term-by-all-terms t1 (rest-terms L))))))
 
   (define (add-poly p1 p2)
     (if (same-variable? (variable p1) (variable p2))
-      (make-poly (variable p1)
-                 (add-terms (term-list p1)
-                            (term-list p2)))
-      (error "多项式变量不同 -- ADD-POLY" (list p1 p2))))
+        (make-poly (variable p1)
+                   (add-terms (term-list p1)
+                              (term-list p2)))
+        (error "多项式变量不同 -- ADD-POLY" (list p1 p2))))
 
   (define (mul-poly p1 p2)
     (if (same-variable? (variable p1) (variable p2))
-      (make-poly (variable p1)
-                 (mul-terms (term-list p1)
-                            (term-list p2)))
-      (error "多项式变量不同 -- ADD-POLY" (list p1 p2))))
+        (make-poly (variable p1)
+                   (mul-terms (term-list p1)
+                              (term-list p2)))
+        (error "多项式变量不同 -- ADD-POLY" (list p1 p2))))
 
   (define (neg-poly p)
     (make-poly (variable p) (neg-terms (term-list p))))
 
   (define (neg-terms term-list)
     (if (empty-termlist? term-list)
-      (the-empty-termlist)
-      (let ((first-term-order (order (first-term term-list)))
-            (first-term-coeff (coeff (first-term term-list))))
-        (adjoin-term (make-term first-term-order
-                                (neg first-term-coeff))
-                     (neg-terms (rest-terms term-list))))))
+        (the-empty-termlist)
+        (let ((first-term-order (order (first-term term-list)))
+              (first-term-coeff (coeff (first-term term-list))))
+          (adjoin-term (make-term first-term-order
+                                  (neg first-term-coeff))
+                       (neg-terms (rest-terms term-list))))))
 
   (define (the-empty-termlist) '())
   (define (first-term term-list) (car term-list))
@@ -83,8 +84,7 @@
     (cons variable term-list))
   (define (variable p) (car p))
   (define (term-list p) (cdr p))
-  (define (tag p) (attach-tag 'polynomial p))
-
+  (define (tag p) (attach-tag 'poly-sparse p))
   (put 'add '(polynomial polynomial)
        (lambda (p1 p2) (tag (add-poly p1 p2))))
   (put 'sub '(polynomial polynomial)
@@ -99,12 +99,61 @@
        (lambda (p1 p2) (and (same-variable? (variable p1) (variable p2))
                             (eq? (term-list p1) (term-list p2))))))
 
-; 习题2.89 略
-; 习题2.90 略
-; 习题2.91 略
-; 习题2.92 略
-; 习题2.93 略
-; 习题2.94 略
-; 习题2.95 略
-; 习题2.96 略
-; 习题2.97 略
+; (poly-sparse x 1 1 1 1)
+(define (install-poly-dense)
+  (define (variable? x) (symbol? x))
+  (define (same-variable? v1 v2)
+    (and (variable? v1) (variable? v2) (eq? v1 v2)))
+  (define (zero? p)
+    (define (zero?-coeff c)
+      (cond ((null? c) #t)
+        (else (and (= (car c) 0)
+                   (zero?-coeff (cdr c))))))
+    (zero?-coeff (cddr p)))
+
+  (define (add-poly p1 p2)
+    (if (same-variable? (variable? p1) (variable? p2))
+        (make-poly (variable p1)
+                   (add-terms (term-list p1)
+                              (term-list p2)))
+        (error "多项式变量不同 -- ADD-POLY" (list p1 p2))))
+
+  ; term-list将稠密的转为稀疏的输出
+  (define (term-list p)
+    (let ((terms (cddr p)))
+      (cond
+        ((null? terms) (the-empty-termlist))
+        ((zero? (car terms)) (term-list (cdr terms)))
+        (else (let ((rest-terms (cdr terms))
+                    (cur-term (car terms)))
+                ; rest-terms的长度就是当前项的阶数
+                (cons (list cur-term (length-of rest-terms))
+                      (term-list rest-terms)))))))
+  )
+
+(define (install-polynomial-package)
+  (define (variable? x) (symbol? x))
+  (define (same-variable? v1 v2)
+    (and (variable? v1) (variable? v2) (eq? v1 v2)))
+
+  (define (=zero? arg)
+    (apply-generic 'zero? arg))
+
+  (define (adjoin-term term term-list)
+    (if (zero? (coeff term))
+        term-list
+        (cons term term-list)))
+
+  (put 'add '(polynomial polynomial)
+       (lambda (p1 p2) (tag (add-poly p1 p2))))
+  (put 'sub '(polynomial polynomial)
+       (lambda (p1 p2) (tag (add-poly p1 (neg-poly p2)))))
+  (put 'mul '(polynomial polynomial)
+       (lambda (p1 p2) (tag (mul-poly p1 p2))))
+  (put 'make 'polynomial (lambda (var terms) (tag (make-poly var terms))))
+
+  (put 'neg '(polynomial) (lambda (p) (tag (neg-poly p))))
+
+  (put 'equ? '(polynomial polynomial)
+       (lambda (p1 p2) (and (same-variable? (variable p1) (variable p2))
+                            (eq? (term-list p1) (term-list p2))))))
