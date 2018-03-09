@@ -3,8 +3,11 @@
 
 (add-to-load-path ".")
 
-; (poly-sparse x (2 2) (1 1) (0 1))
+; 加减以稠密表示，乘除以稀疏表示
+
+; (sparse x (2 2) (1 1) (0 1))
 (define (install-poly-sparse)
+  (define (tag p) (attach-tag 'sparse p))
   (define (variable? x) (symbol? x))
   (define (same-variable? v1 v2)
     (and (variable? v1) (variable? v2) (eq? v1 v2)))
@@ -14,6 +17,19 @@
         (else (and (= (cadar c) 0)
                    (zero?-coeff (cdr c))))))
     (zero?-coeff (cddr p)))
+
+  (define (term-list-sparse p) (cdr p))
+
+  (define (term-list-dense p)
+    (define (do-dense iter cur-order terms)
+      (if (null? terms)
+          iter
+        (let ((cur-term (car terms)))
+          (if (equ? cur-order (car cur-term))
+             (do-dense (cons (cadr cur-term) iter) (cdr terms))
+             (do-dense (cons 0 iter) terms)))))
+    (do-dense '() (car (car (term-list-sparse p))) terms))
+
   (define (adjoin-term term term-list)
     (if (zero? (coeff term))
         term-list
@@ -84,7 +100,6 @@
     (cons variable term-list))
   (define (variable p) (car p))
   (define (term-list p) (cdr p))
-  (define (tag p) (attach-tag 'poly-sparse p))
   (put 'add '(polynomial polynomial)
        (lambda (p1 p2) (tag (add-poly p1 p2))))
   (put 'sub '(polynomial polynomial)
@@ -129,6 +144,42 @@
                 ; rest-terms的长度就是当前项的阶数
                 (cons (list cur-term (length-of rest-terms))
                       (term-list rest-terms)))))))
+  (define (add-terms L1 L2)
+    (cond
+      ((empty-termlist? L1) L2)
+      ((empty-termlist? L2) L1)
+      (else (let ((t1 (first-term L1))
+                  (t2 (first-term L2)))
+              (cond
+                ((> (order t1) (order t2))
+                 (adjoin-term t1 (add-terms (rest-terms L1) L2)))
+                ((< (order t1) (order t2))
+                 (adjoin-term t2 (add-terms L1 (rest-terms L2))))
+                (else (adjoin-term
+                        (make-term (order t1)
+                                   (add (coeff t1) (coeff t2)))
+                        (add-terms (rest-terms L1) (rest-terms L2)))))))))
+  (define (add-poly p1 p2)
+    (if (same-variable? (variable p1) (variable p2))
+        (make-poly (variable p1)
+                   (add-terms (term-list p1)
+                              (term-list p2)))
+        (error "多项式变量不同 -- ADD-POLY" (list p1 p2))))
+  (define (neg-poly p)
+    (make-poly (variable p) (neg-terms (term-list p))))
+
+  (define (neg-terms term-list)
+    (if (empty-termlist? term-list)
+        (the-empty-termlist)
+        (let ((first-term-order (order (first-term term-list)))
+              (first-term-coeff (coeff (first-term term-list))))
+          (adjoin-term (make-term first-term-order
+                                  (neg first-term-coeff))
+                       (neg-terms (rest-terms term-list))))))
+  (define (the-empty-termlist) '())
+  (define (first-term term-list) (car term-list))
+  (define (rest-terms term-list) (cdr term-list))
+  (define (empty-termlist? term-list) (null? term-list))
   )
 
 (define (install-polynomial-package)
