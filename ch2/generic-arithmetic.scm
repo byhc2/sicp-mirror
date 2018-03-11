@@ -8,9 +8,10 @@
                               denom make-rat project
                               apply-generic trans-type
                               make-polynomial
-                              term-list neg
+                              neg
                               make-complex-from-real-imag
-                              make-complex-from-mag-ang))
+                              make-complex-from-mag-ang
+                              make-sparse-poly))
 
 (add-to-load-path ".")
 (load "environ.scm")
@@ -96,8 +97,8 @@
   ((get 'make-from-mag-ang 'complex) r a))
 
 ; 习题2.87
-(define (make-polynomial var terms)
-  ((get 'make 'polynomial) var terms))
+(define (make-sparse-poly var terms)
+  ((get 'make-from-sparse 'polynomial) var terms))
 
 ; 以下所有函数不做类型检查
 ; 若遇非其所用类型，则无限递归

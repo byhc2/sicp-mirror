@@ -3,13 +3,6 @@
 
 (add-to-load-path ".")
 (use-modules (generic-arithmetic))
-(use-modules (scheme-number))
-(use-modules (rational-number))
-(use-modules (complex-number))
-
-(install-scheme-number-package)
-(install-rational-number-package)
-(install-complex-number-package)
 
 ; 习题2.82
 ; 实际代码在generic-arithmetic.scm中
