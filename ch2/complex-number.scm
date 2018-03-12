@@ -22,7 +22,7 @@
     (and (apply-generic 'equ? (rpart z1) (rpart z2))
          (apply-generic 'equ? (ipart z1) (ipart z2))))
 
-  (define (zero? z)
+  (define (=zero?-rectangular z)
     (and (apply-generic equ? (rpart z) 0)
          (apply-generic equ? (ipart z) 0)))
 
@@ -35,7 +35,7 @@
     (put 'mag '(rectangular) mag)
     (put 'ang '(rectangular) ang)
     (put 'equ? '(rectangular rectangular) equ?)
-    (put 'zero? '(rectangular) zero?)
+    (put '=zero? '(rectangular) =zero?-rectangular)
     (put 'make-from-real-imag '(rectangular)
          (lambda (x y) (tag (make-from-real-imag x y))))
     (put 'make-from-mag-ang '(rectangular)
@@ -50,7 +50,7 @@
     (and (apply-generic 'equ? (mag z1) (mag z2))
          (apply-generic 'equ? (ang z1) (ang z2))))
 
-  (define (zero? z)
+  (define (=zero?-polar z)
     (and (apply-generic 'equ? (mag z) 0)
          (apply-generic 'equ? (ang z) 0)))
 
@@ -64,7 +64,7 @@
     (put 'mag '(polar) mag)
     (put 'ang '(polar) ang)
     (put 'equ? '(polar polar) equ?)
-    (put 'zero? '(polar) zero?)
+    (put '=zero? '(polar) =zero?-polar)
     (put 'make-from-real-imag '(polar)
          (lambda (x y) (tag (make-from-real-imag x y))))
     (put 'make-from-mag-ang '(polar)
@@ -96,8 +96,8 @@
   (define (equ?-complex z1 z2)
     (apply-generic 'equ? z1 z2))
 
-  (define (zero? z)
-    (apply-generic 'zero? z))
+  (define (=zero?-complex z)
+    (apply-generic '=zero? z))
 
   (define (tag x) (attach-tag 'complex x))
   (put 'add '(complex complex) (lambda (z1 z2) (tag (add-complex z1 z2))))
@@ -105,14 +105,14 @@
   (put 'mul '(complex complex) (lambda (z1 z2) (tag (mul-complex z1 z2))))
   (put 'div '(complex complex) (lambda (z1 z2) (tag (div-complex z1 z2))))
   (put 'equ? '(complex complex) (lambda (z1 z2) (equ?-complex z1 z2)))
-  (put 'zero? '(complex) (lambda (z) (zero? z)))
+  (put '=zero? '(complex) (lambda (z) (=zero?-complex z)))
   (put 'mag '(complex) mag)
   (put 'ang '(complex) ang)
   (put 'rpart '(complex) rpart)
   (put 'ipart '(complex) ipart)
-  (put 'make-from-real-imag 'complex
+  (put 'make-from-real-imag '(complex)
        (lambda (x y) (tag (make-from-real-imag x y))))
-  (put 'make-from-mag-ang 'complex
+  (put 'make-from-mag-ang '(complex)
        (lambda (x y) (tag (make-from-mag-ang x y)))))
 
 (install-rectangular-package)

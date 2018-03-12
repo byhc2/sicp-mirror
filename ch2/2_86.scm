@@ -36,7 +36,7 @@
 ;(display (rpart var4))
 ;(display (add var4 var4))
 ;(define var5 (make-complex-from-real-imag 0 0))
-;(display (zero? var5))
+;(display (=zero? var5))
 ;(display (sine var3))
 (newline)
 ;(display (cosine var3))

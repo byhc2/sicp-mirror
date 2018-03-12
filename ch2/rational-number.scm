@@ -47,4 +47,4 @@
   (put 'numer '(rational) (lambda (x) (numer x)))
   (put 'sine '(rational) (lambda (x) (tag (sine (div (numer x) (denom x))))))
   (put 'cosine '(rational) (lambda (x) (tag (cosine (div (numer x) (denom x))))))
-  (put 'make 'rational (lambda (n d) (tag (make-rat n d)))))
+  (put 'make '(rational) (lambda (n d) (tag (make-rat n d)))))

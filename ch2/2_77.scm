@@ -19,7 +19,7 @@
 
 ; 习题2.80
 ; 以复数为例
-; (put 'zero? '(complex complex) (lambda (n1 n2) (tag (zero?-complex n1 n2))))
+; (put '=zero? '(complex complex) (lambda (n1 n2) (tag (=zero?-complex n1 n2))))
 
 ; 习题2.81
 ; a 出现无限递归

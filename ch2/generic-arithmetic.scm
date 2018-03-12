@@ -3,12 +3,11 @@
 
 (define-module (generic-arithmetic)
                #: export (add sub mul div equ? sine
-                              zero?  ipart drop cosine
+                              =zero?  ipart drop cosine
                               rpart mag ang numer
                               denom make-rat project
                               apply-generic trans-type
-                              make-polynomial
-                              neg
+                              neg variable
                               make-complex-from-real-imag
                               make-complex-from-mag-ang
                               make-sparse-poly))
@@ -46,10 +45,6 @@
   (drop (apply do-apply-generic op args)))
 
 (define (do-apply-generic op . args)
-  (display op)
-  (display " ")
-  (display args)
-  (newline)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
       (if proc
@@ -86,19 +81,22 @@
 
 ; 此时业已不需make-scheme-number
 (define (make-scheme-number n)
-  ((get 'make 'scheme-number) n))
+  ((get 'make '(scheme-number)) n))
 
 (define (make-rat n d)
-  ((get 'make 'rational) n d))
+  ((get 'make '(rational)) n d))
 
 (define (make-complex-from-real-imag x y)
-  ((get 'make-from-real-imag 'complex) x y))
+  ((get 'make-from-real-imag '(complex)) x y))
 (define (make-complex-from-mag-ang r a)
-  ((get 'make-from-mag-ang 'complex) r a))
+  ((get 'make-from-mag-ang '(complex)) r a))
 
-; 习题2.87
+; 习题2.89
+; 习题2.90
+; 习题2.91
+; 习题2.92
 (define (make-sparse-poly var terms)
-  ((get 'make-from-sparse 'polynomial) var terms))
+  ((get 'make-sparse '(polynomial)) var terms))
 
 ; 以下所有函数不做类型检查
 ; 若遇非其所用类型，则无限递归
@@ -115,9 +113,10 @@
 ; 习题2.79
 (define (equ? x y) (apply-generic 'equ? x y))
 ; 习题2.80
-(define (zero? x) (apply-generic 'zero? x))
+(define (=zero? x) (apply-generic '=zero? x))
 ; 习题2.88
 (define (neg x) (apply-generic 'neg x))
+(define (variable p) (apply-generic 'variable p))
 
 (put-coercion 'scheme-number 'rational
               (lambda (x) (make-rat x 1)))
@@ -141,13 +140,17 @@
 (define (drop arg)
   (cond
     ((or (eq? arg #t) (eq? arg #f)) arg)
+    ((symbol? arg) arg)
+    ((eq? (type-tag arg) 'poly-quotient) arg)
     (else (let ((after-drop (project arg)))
             (if (equ? arg after-drop)
                 after-drop
                 (if (eq? (type-tag after-drop) 'scheme-number)
                     (drop after-drop)))))))
-; 复数->实数->整数
-; 有理数->整数
+
+; 复数有理数等作为仅有0次幂多项式
+; 多项式->复数->实数->整数
+; 多项式->有理数->整数
 (define (project arg)
   (let ((type (type-tag arg)))
     (cond

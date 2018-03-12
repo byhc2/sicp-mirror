@@ -16,6 +16,6 @@
   (put 'equ? '(scheme-number scheme-number) (lambda (x y) (= x y)))
   (put 'sine '(scheme-number) (lambda (x) (tag (sin x))))
   (put 'cosine '(scheme-number) (lambda (x) (tag (cos x))))
-  (put 'zero? '(scheme-number) (lambda (x) (= x 0)))
+  (put '=zero? '(scheme-number) (lambda (x) (= x 0)))
   (put 'neg '(scheme-number) (lambda (x) (tag (- 0 x))))
-  (put 'make 'scheme-number (lambda (x) (tag x))))
+  (put 'make '(scheme-number) (lambda (x) (tag x))))
