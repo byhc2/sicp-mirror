@@ -14,3 +14,6 @@
 ;(newline)
 (display (+ (f 1) (f 0)))
 (newline)
+
+; 习题3.9
+; TODO
