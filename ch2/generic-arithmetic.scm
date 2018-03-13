@@ -91,12 +91,10 @@
 (define (make-complex-from-mag-ang r a)
   ((get 'make-from-mag-ang '(complex)) r a))
 
-; 习题2.89
-; 习题2.90
-; 习题2.91
-; 习题2.92
 (define (make-sparse-poly var terms)
   ((get 'make-sparse '(polynomial)) var terms))
+(define (make-dense-poly var terms)
+  ((get 'make-dense '(polynomial)) var terms))
 
 ; 以下所有函数不做类型检查
 ; 若遇非其所用类型，则无限递归
@@ -124,7 +122,6 @@
               (lambda (x) (make-complex-from-real-imag x 0)))
 (put-coercion 'rational 'complex
               (lambda (x) (make-complex-from-real-imag (div (numer x) (denom x)) 0)))
-
 
 ; 习题2.81
 ; a 对exp调用复数
