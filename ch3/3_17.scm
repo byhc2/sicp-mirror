@@ -1,6 +1,7 @@
 #!/usr/bin/guile
 !#
 
+; 习题 3.17
 (define checked (list))
 
 (define (set-check x)
