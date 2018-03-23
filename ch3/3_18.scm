@@ -44,13 +44,13 @@
 (display (has-loop? z))
 (newline)
 
-;  ------
+;  +----+
 ;  |    |
 ;  v    |
 ; [* *] |
 ;  | |  |
 ;  v |  |
-;  a ----
+;  a +--+
 (define u (cons 'a 'b))
 (set-cdr! u u)
 (display (has-loop? u))
