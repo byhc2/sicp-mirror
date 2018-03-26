@@ -1,8 +1,11 @@
 #!/usr/bin/guile
 !#
 
+; 习题3.19
 ; 通过步长不一致的遍历来确定
 ; 如果某个节点的car也是一个列表，则递归校验
+; 二不同节点的car或cdr即使指向一个列表，此指向亦不成环
+; 故遇有car或cdr为列表者，可递归校验
 (define (has-loop? lst)
   (define (safe-cdr x)
     (if (pair? x)
@@ -91,3 +94,5 @@
 (newline)
 (display (has-loop? v1))
 (newline)
+
+; 习题3.20略
