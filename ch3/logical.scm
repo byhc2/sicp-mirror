@@ -4,8 +4,8 @@
 (add-to-load-path ".")
 (load "fifo.scm")
 
-(define (make-wire)
-  (let ((signal-value 0)
+(define (make-wire i)
+  (let ((signal-value i)
         (action-procedures '()))
     (define (set-my-signal! new-value)
       (if (not (= signal-value new-value))
@@ -64,7 +64,7 @@
                    (lambda ()
                      (set-signal! output new-value)))))
   (add-action! a1 and-action-procedure)
-  (add-action! a1 and-action-procedure)
+  (add-action! a2 and-action-procedure)
   'ok)
 
 (define (or-gate a1 a2 output)
@@ -80,7 +80,7 @@
                    (lambda ()
                      (set-signal! output new-value)))))
   (add-action! a1 or-action-procedure)
-  (add-action! a1 or-action-procedure)
+  (add-action! a2 or-action-procedure)
   'ok)
 
 (define (half-adder a b s c)
@@ -103,7 +103,10 @@
 (define (after-delay dl action)
   (add-to-agenda! (+ dl (c-time the-agenda))
                   action
-                  the-agenda))
+                  the-agenda)
+  (display the-agenda)
+  (newline)
+  )
 
 (define (make-time-segment time queue)
   (cons time queue))
@@ -126,11 +129,19 @@
 
 (define (propagate)
   (if (empty-agenda? the-agenda)
-      'done
+      (begin
+        (display "propagate finish")
+        (newline)
+        )
       (let ((first-item (first-agenda-item the-agenda)))
+        (display "do propagate")
+        (newline)
+        (display first-item)
+        (newline)
         (first-item)
         (remove-first-agenda-item! the-agenda)
-        (propagate))))
+        (propagate))
+      ))
 
 (define (probe name wire)
   (add-action! wire
@@ -185,4 +196,40 @@
         (set-current-time! agenda (segment-time first-seg))
         (front-queue (segment-queue first-seg)))))
 
-; 习题
+; 习题3.31
+;(define i (make-wire))
+;(define o (make-wire))
+;(inverter i o)
+;(set-signal! i 1)
+;(propagate)
+; 以上代码为例
+; 行18不调用proc时
+; (inverter i o)仅放invert-input到i之action-procedures
+; the-agenda空
+; (set-signal! i 1)设i为1，调用i之所有action-procedures，列invert-input之内lambda入the-agenda
+; (propagate)调用the-agenda之lambda，设o之值为0
+
+; 行18调用proc时
+; (inverter i o)列invert-input入i之action-procedures，列invert-input之lambda入the-agenda
+; the-agenda有行51之lambda
+; (set-signal! i 1)设i为1，调用i之所有action-procedures，再列invert-input之内lambda入the-agenda
+; the-agenda有二行51之lambda
+; (propagate)调用the-agenda之lambda，设o之值为1
+; (propagate)再调用the-agenda之lambda，设o之值为0
+
+; 行18不调用proc时
+; 若加probe于o上，则仅列probe于o之action-procedures内
+; the-agenda无probe内容
+; propagate亦无从调用probe显示
+
+; 以上也可以此来看：
+; 于逻辑数字电路，propagate如加电于电路，则电路非混沌，inverter之i
+; o必一为0，一为1，或反之
+; 然，初始时，make-wire所造i o俱为0
+; 加电时，o须立即由0变1。此18行proc之功劳也
+; 若非是，则加电后，i
+; o俱为0，设i为1时，o实际无须变化，set-my-signal!之if判断无需执行
+; 即set-signal!无需一一调用action-procedures
+; 故连于o之probe无需执行
+
+; 然，可于make-wire加一初始值设置线路，则probe无需先执行也

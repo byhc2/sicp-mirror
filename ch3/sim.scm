@@ -4,24 +4,22 @@
 (add-to-load-path ".")
 (load "logical.scm")
 
-(define input-1 (make-wire))
-(define input-2 (make-wire))
-(define sum (make-wire))
-(define carry (make-wire))
-
-(probe 'sum sum)
-(probe 'carry carry)
-
-(set-signal! input-1 0)
-(set-signal! input-2 0)
-(set-signal! sum 0)
-(set-signal! carry 0)
-
-(half-adder input-1 input-2 sum carry)
-(set-signal! input-1 1)
-(propagate)
-(set-signal! input-2 1)
-(propagate)
+;(define input-1 (make-wire))
+;(define input-2 (make-wire))
+;(define sum (make-wire))
+;(define carry (make-wire))
+;
+;(probe 'sum sum)
+;(probe 'carry carry)
+;
+;(set-signal! input-1 0)
+;(set-signal! input-2 0)
+;
+;(half-adder input-1 input-2 sum carry)
+;(set-signal! input-1 1)
+;(propagate)
+;(set-signal! input-2 1)
+;(propagate)
 
 
 ;(define a (make-wire))
@@ -34,5 +32,13 @@
 ;(propagate)
 ;(set-signal! b 1)
 ;(propagate)
+
+(define i (make-wire 0))
+(define o (make-wire 1))
+(inverter i o)
+(probe 'o o)
+(set-signal! i 1)
+(propagate)
+(propagate)
 
 (newline)
