@@ -10,7 +10,7 @@
 (define (set-value! connector new-value informant)
   ((connector 'set-value!) new-value informant))
 (define (forget-value! connector retractor)
-  ((connector 'forget) retractor))
+  ((connector 'forget!) retractor))
 (define (connect connector new-constraint)
   ((connector 'connect) new-constraint))
 
@@ -62,7 +62,7 @@
       ((and (has-value? product) (has-value? a2))
        (set-value! a1 (/ (get-value product) (get-value a2)) me))))
   (define (process-forget-value)
-    (forget-value! sum me)
+    (forget-value! product me)
     (forget-value! a1 me)
     (forget-value! a2 me)
     (process-new-value))
@@ -77,6 +77,30 @@
   (connect a1 me)
   (connect a2 me)
   (connect product me)
+  me)
+
+; 习题3.35
+(define (squarer a b)
+  (define (process-new-value)
+    (if (has-value? a)
+       (set-value! b (* (get-value a) (get-value a)) me)
+       (if (< (get-value b) 0)
+           (error "square less than 0 -- SQUARER" (get-value b))
+           (set-value! a (sqrt (get-value b)) me))))
+  (define (process-forget-value)
+    (forget-value! a me)
+    (forget-value! b me)
+    (process-forget-value))
+  (define (me request)
+    (cond
+      ((eq? request 'I-have-a-value)
+       (process-new-value))
+      ((eq? request 'I-lost-my-value)
+       (process-forget-value))
+      (else
+        (error "unknown request -- SQUARER" request))))
+  (connect a me)
+  (connect b me)
   me)
 
 (define (constant value connector)
@@ -140,7 +164,7 @@
         ((eq? request 'has-value?) (if informant #t #f))
         ((eq? request 'value) value)
         ((eq? request 'set-value!) set-my-value)
-        ((eq? request 'forget-value!) forget-my-value)
+        ((eq? request 'forget!) forget-my-value)
         ((eq? request 'connect) connect)
         (else (error "unknown operation -- CONNECTOR" request))))
     me))
@@ -153,3 +177,5 @@
       (else (procedure (car items))
             (loop (cdr items)))))
   (loop lst))
+
+; 习题3.36 略

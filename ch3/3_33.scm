@@ -14,10 +14,10 @@
         (n (make-connector)))
     (adder a b m)
     (multiplier m n c)
-    (constant 2 n)
+    (constant 0.5 n)
     'ok))
 
-(set-value! c 0 'nobody)
+(averager a b c)
 (set-value! a 100 'user)
 (set-value! b 50 'user)
 
