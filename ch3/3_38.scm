@@ -41,3 +41,28 @@
 ; R21->R22->W2->R23 ---> 10000
 ; R21->R22->R23->W2 ---> 1000
 ; 串行化以后，仅1000000一结果
+
+; 习题3.41
+; 没有必要，因为读取操作的先后顺序无所谓
+
+; 习题3.42
+; 此题不会。按照网上说法，若以make-serializer构造一个列表，列表中过程顺序执行来看
+; 新版make-account实际上是执行了make-serializer列表中同一个元素三次
+; 这三次并发不受make-serializer控制
+
+; 习题3.43 略
+
+; 习题3.44
+; transfer不是一个原子操作，有中间状态
+; exchange是一个原子操作，无中间状态
+
+; 习题3.45
+; 如此调用serialized-exchange时，将发生
+; ((serializer1 (serializer2 exchange)) acc1 acc2)
+; serializer1和serializer2本身会锁住acc1和acc2，然后调用exchange
+; exchange内将再次试图锁住acc1和acc2，从而导致死锁
+
+; 习题3.46 略
+; 习题3.47 略
+; 习题3.48 略
+; 习题3.49 略
