@@ -36,10 +36,12 @@
 
 (define (display-line x)
   (newline)
+  (display "xxxxxxxx")
+  (newline)
   (display x))
 
 (define (stream-car stream) (car stream))
-(define (stream-cdr stream) (stream-force (cdr stream)))
+(define (stream-cdr stream) (force (cdr stream)))
 
 (define (stream-enumerate-interval low high)
   (if (> low high)
@@ -57,26 +59,27 @@
     (else
       (stream-filter pred (stream-cdr stream)))))
 
+; 此cons-stream错误
+; 因stream-delay为函数，则使用时参数b预先已求值
+; 故并未真正实现延迟求值
+; 故cons-stream与delay与force必为特殊定义
 ;(define (stream-delay f)
 ;  (lambda () (let ((already-run? #f)
 ;                   (result #f))
 ;               (if (not already-run?)
 ;                   (begin
-;                     (display "-----------------")
-;                     (newline)
-;                     (display (f))
-;                     (newline)
 ;                     (set! result (f))
 ;                     (set! already-run? #t)
 ;                     result)
 ;                   result))))
-(define (stream-delay f)
-  (let ((d (lambda () (f))))
-    d))
-(define (stream-force delay-obj) (delay-obj))
+;(define (stream-force delay-obj) (delay-obj))
 
-(define (cons-stream a b)
-  (cons a (stream-delay b)))
+;(define (cons-stream a b)
+;  (cons a (stream-delay b)))
+
+(define-syntax cons-stream
+  (syntax-rules ()
+    ((_ a b) (cons a (delay b)))))
 
 (define the-empty-stream '())
 
