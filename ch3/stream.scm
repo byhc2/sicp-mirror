@@ -1,6 +1,3 @@
-#!/usr/bin/guile
-!#
-
 ; 此cons-stream错误
 ; 因stream-delay为函数，则使用时参数b预先已求值
 ; 故并未真正实现延迟求值
@@ -59,7 +56,9 @@
   (stream-for-each display-line s))
 
 (define (display-line x)
+  (newline)
   (display x))
+
 
 (define (stream-car stream) (car stream))
 (define (stream-cdr stream) (force (cdr stream)))
@@ -79,3 +78,21 @@
                   (stream-filter pred (stream-cdr stream))))
     (else
       (stream-filter pred (stream-cdr stream)))))
+
+(define (integers-starting-from n)
+  (cons-stream n (integers-starting-from (+ n 1))))
+
+(define integers (integers-starting-from 1))
+
+(define (divisable? x y) (= (remainder x y) 0))
+(define (fibgen a b)
+  (cons-stream a (fibgen b (+ a b))))
+(define fibs (fibgen 0 1))
+
+(define (sieve stream)
+  (cons-stream (stream-car stream)
+               (sieve (stream-filter (lambda (x) (not (divisable? x (stream-car
+                                                                      stream))))
+                                     (stream-cdr stream)))))
+
+(define primes (sieve (integers-starting-from 2)))

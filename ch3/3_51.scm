@@ -3,7 +3,9 @@
 
 ; 习题3.51
 (add-to-load-path ".")
-(load "stream.scm")
+(load "./stream.scm")
+;(require racket/include)
+;(include "./stream.scm")
 
 (define (show x)
   (display-line x)
@@ -15,6 +17,6 @@
 ;(newline)
 
 (define x (stream-map show (stream-enumerate-interval 0 20)))
-(stream-ref x 5)
-(stream-ref x 7)
+(display (stream-ref x 5))
+(display (stream-ref x 7))
 
