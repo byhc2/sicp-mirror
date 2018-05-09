@@ -30,6 +30,15 @@
       (stream-car s)
       (stream-ref (stream-cdr s) (- n 1))))
 
+; 输出流s的前n项
+(define (stream-take s n)
+  (if (= n 0)
+      (newline)
+      (begin
+        (display (stream-car s))
+        (newline)
+        (stream-take (stream-cdr s) (- n 1)))))
+
 (define (stream-map0 proc s)
   (if (stream-null? s)
       the-empty-stream
@@ -83,6 +92,7 @@
   (cons-stream n (integers-starting-from (+ n 1))))
 
 (define integers (integers-starting-from 1))
+(define ones (cons-stream 1 ones))
 
 (define (divisable? x y) (= (remainder x y) 0))
 (define (fibgen a b)
