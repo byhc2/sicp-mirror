@@ -106,3 +106,17 @@
                                      (stream-cdr stream)))))
 
 (define primes (sieve (integers-starting-from 2)))
+
+; 流s前n项和
+(define (stream-accumulate s n)
+  (define (iter sum s0 i)
+    (if (> i n)
+        sum
+        (iter (+ sum (stream-car s0)) (stream-cdr s0) (+ i 1))))
+  (iter 0 s 0))
+
+(define (mul-stream . args)
+  (apply stream-map * args))
+
+(define (add-streams . args)
+  (apply stream-map + args))
