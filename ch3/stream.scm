@@ -120,3 +120,22 @@
 
 (define (add-streams . args)
   (apply stream-map + args))
+
+; 开方流
+(define (sqrt-improve guess x)
+  (/ (+ guess (/ x guess)) 2))
+; 习题3.63
+; Louis代码每次需要求解流中第n个值时
+; 都要重新生成流，然后计算前n-1项
+; 估计复杂度为n^2，因算n需要算n-1，算n-1要算n-2
+; 另
+; guesses版无此问题
+; 盖因计算n项时，递归引用guesses本身，而非构造新流
+; 此外，因delay有记忆，可记住guesses之前结果
+; 若delay无记忆，则复杂度亦为n^2
+(define (sqrt-stream x)
+  (define guesses
+    (cons-stream 1.0
+                 (stream-map (lambda (guess) (sqrt-improve guess x))
+                             guesses)))
+  guesses)

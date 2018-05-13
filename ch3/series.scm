@@ -49,3 +49,19 @@
 ; 正切幂级数
 (define tan-series
   (div-series sine-series cosine-series))
+
+(define (square x) (* x x))
+
+; 级数部分和
+(define (partial-sums stream)
+  (let ((d (stream-car stream)))
+    (cons-stream d
+                 (stream-map (lambda (x) (+ x d))
+                              (partial-sums (stream-cdr stream))))))
+
+(define (euler-transform s)
+  (let ((s0 (stream-ref 0))
+        (s1 (stream-ref 1))
+        (s2 (stream-ref 2)))
+    (cons-stream (- s2 (/ (square (- s2 s0)) (+ (- s0 (* 2 s1)) s2)))
+                 (euler-transform (stream-cdr s)))))
