@@ -139,3 +139,15 @@
                  (stream-map (lambda (guess) (sqrt-improve guess x))
                              guesses)))
   guesses)
+
+; 习题3.64
+(define (stream-limit s tolerance)
+  (let ((s1 (stream-ref s 0))
+        (s2 (stream-ref s 1)))
+    (if (< (abs (- s1 s2)) tolerance)
+        s1
+        (stream-limit (stream-cdr s) tolerance))))
+;(define (stream-limit s tolerance)
+;  (if (< (abs (- (stream-ref s 0) (stream-ref s 1))) tolerance)
+;      (stream-ref s 0)
+;      (stream-limit (stream-cdr s) tolerance)))

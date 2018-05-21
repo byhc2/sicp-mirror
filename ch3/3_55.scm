@@ -4,6 +4,8 @@
 (require racket/include)
 (include "stream.scm")
 
+; 习题3.55
+; 流的序列和
 (define (partial-sums stream)
   (let ((d (stream-car stream)))
     (cons-stream d
