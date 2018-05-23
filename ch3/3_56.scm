@@ -2,8 +2,7 @@
 #lang scheme
 
 ; 习题3.56
-(require racket/include)
-(include "stream.scm")
+(require "stream.scm")
 
 (define (scale-stream stream factor)
   (stream-map (lambda (x) (* x factor)) stream))

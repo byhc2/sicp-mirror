@@ -1,8 +1,7 @@
 #!/usr/bin/racket
 #lang scheme
 
-(require racket/include)
-(include "stream.scm")
+(require "stream.scm")
 
 (define (mul-streams s1 s2)
   (stream-map * s1 s2))

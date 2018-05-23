@@ -1,3 +1,28 @@
+#lang racket
+
+(provide cons-stream
+         the-empty-stream
+         stream-null?
+         stream-ref
+         display-stream-n
+         stream-map
+         display-stream
+         stream-car
+         stream-cdr
+         stream-enumerate-interval
+         stream-filter
+         integers-starting-from
+         integers
+         ones
+         fibs
+         primes
+         stream-accumulate
+         display-line
+         mul-stream
+         add-streams
+         sqrt-stream
+         stream-limit)
+
 ; 此cons-stream错误
 ; 因stream-delay为函数，则使用时参数b预先已求值
 ; 故并未真正实现延迟求值
@@ -31,13 +56,13 @@
       (stream-ref (stream-cdr s) (- n 1))))
 
 ; 输出流s的前n项
-(define (stream-take s n)
+(define (display-stream-n s n)
   (if (= n 0)
       (newline)
       (begin
         (display (stream-car s))
         (newline)
-        (stream-take (stream-cdr s) (- n 1)))))
+        (display-stream-n (stream-cdr s) (- n 1)))))
 
 (define (stream-map0 proc s)
   (if (stream-null? s)
@@ -67,7 +92,6 @@
 (define (display-line x)
   (newline)
   (display x))
-
 
 (define (stream-car stream) (car stream))
 (define (stream-cdr stream) (force (cdr stream)))

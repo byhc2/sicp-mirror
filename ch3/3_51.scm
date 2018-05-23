@@ -1,11 +1,8 @@
-#!/usr/bin/guile
-!#
+#!/usr/bin/racket
+#lang racket
 
 ; 习题3.51
-(add-to-load-path ".")
-(load "./stream.scm")
-;(require racket/include)
-;(include "./stream.scm")
+(require "stream.scm")
 
 (define (show x)
   (display-line x)

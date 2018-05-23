@@ -1,3 +1,20 @@
+#lang racket
+
+(require "stream.scm")
+
+(provide integrate-series
+         exp-series
+         scale-stream
+         cosine-series
+         sine-series
+         mul-series
+         invert-series
+         div-series
+         tan-series
+         partial-sums
+         euler-transform
+         accelerated-sequence)
+
 ; 无穷级数相关定义
 
 ; 某级数不含常数项积分级数
@@ -59,9 +76,17 @@
                  (stream-map (lambda (x) (+ x d))
                               (partial-sums (stream-cdr stream))))))
 
+; 欧拉加速
 (define (euler-transform s)
-  (let ((s0 (stream-ref 0))
-        (s1 (stream-ref 1))
-        (s2 (stream-ref 2)))
-    (cons-stream (- s2 (/ (square (- s2 s0)) (+ (- s0 (* 2 s1)) s2)))
+  (let ((s0 (stream-ref s 0))
+        (s1 (stream-ref s 1))
+        (s2 (stream-ref s 2)))
+    (cons-stream (- s2 (/ (square (- s2 s1)) (+ s0 (* -2 s1) s2)))
                  (euler-transform (stream-cdr s)))))
+
+; 超级加速
+(define (make-tableau transform s)
+  (cons-stream s (make-tableau transform (transform s))))
+
+(define (accelerated-sequence transform s)
+  (stream-map stream-car (make-tableau transform s)))

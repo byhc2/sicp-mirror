@@ -1,8 +1,7 @@
 #!/usr/bin/racket
 #lang scheme
 
-(require racket/include)
-(include "stream.scm")
+(require "stream.scm")
 
 ; 习题3.55
 ; 流的序列和

@@ -2,9 +2,8 @@
 #lang scheme
 
 ; 习题3.59
-(require racket/include)
-(include "stream.scm")
-(include "series.scm")
+(require "stream.scm")
+(require "series.scm")
 
 ; 习题3.60
 ; 可见，级数前10项和已接近1.0

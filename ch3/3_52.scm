@@ -1,9 +1,8 @@
-#!/usr/bin/guile
-!#
+#!/usr/bin/racket
+#lang racket
 
 ; 习题3.52
-(add-to-load-path ".")
-(load "stream.scm")
+(require "stream.scm")
 
 (define sum 0)
 (define (accum x)

@@ -1,11 +1,8 @@
 #!/usr/bin/racket
-#lang scheme
+#lang racket
 
 ; 习题3.53
-;(add-to-load-path ".")
-;(load "./stream.scm")
-(require racket/include)
-(include "stream.scm")
+(require "stream.scm")
 
 (define (add-streams s1 s2)
   (stream-map + s1 s2))
