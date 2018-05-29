@@ -21,7 +21,10 @@
          mul-stream
          add-streams
          sqrt-stream
+         interleave
          pairs
+         pairs2
+         pairs3
          stream-limit)
 
 ; 此cons-stream错误
@@ -189,3 +192,22 @@
     (interleave
       (stream-map (lambda (x) (list (stream-car s) x)) (stream-cdr t))
       (pairs (stream-cdr s) (stream-cdr t)))))
+
+; 习题3.67
+; 不论i<=j时，分矩阵三，左上角，除左上角第一行，剩余
+(define (pairs2 s t)
+  (cons-stream
+    (list (stream-car s) (stream-car t))
+    (interleave
+      (stream-map (lambda (x) (list (stream-car s) x)) (stream-cdr t))
+      (pairs2 (stream-cdr s) t))))
+
+; 习题3.68
+; 死循环
+; interleave为普通函数，求值先求interleave之参数
+; (stream-map ...)尚可得一流
+; 递归求pairs3则无限递归
+(define (pairs3 s t)
+  (interleave
+    (stream-map (lambda (x) (list (stream-car s) x)) t)
+    (pairs3 (stream-cdr s) (stream-cdr t))))
