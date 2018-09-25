@@ -15,6 +15,23 @@
 ;                  f(x)dt     f(x+dt)dt  f(x+2dt)dt ...
 ;                             f(x)dt     f(x+dt)dt  ...
 ;                                        f(x)dt     ...
+; 上表每列求和得积分流
+; 余以为此算法不妥。其一，积分定义为给定被积函数与自变量区间
+; 求被积函数在区间上所围面积，此算法无自变量区间输入。其二，
+; 积分初始量应隐含于被积函数中。其三，dt指示积分步长，与被积
+; 函数所成流相关。故入参应为被积函数本身，积分上下限，积分步
+; 长
+; 余自定义积分函数如下
+;(define (integral2 integrand-fun lower-bounds upper-bounds dt)
+;  (define (step x) (cons-stream x
+;                                (if (> (+ x dt) upper-bounds)
+;                                    the-empty-stream
+;                                    (step (+ x dt)))))
+;  (define integrand (stream-map integrand-fun (step lower-bounds)))
+;  (define int (let ((tmp (scale-stream integrand dt)))
+;                (cons-stream (stream-car tmp) (add-streams (stream-cdr tmp) int))))
+;  int)
+; 使用(display-stream (integral2 (lambda (x) (* x x)) 0 1 0.00001))
 
 (define (integral integrand initial-value dt)
   (define int
