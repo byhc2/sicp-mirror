@@ -1,19 +1,21 @@
-#!/usr/bin/guile
-!#
+#!/usr/bin/racket
+#lang scheme
 
 ; 习题3.6
 (define (rand m . args)
   (cond
     ((eq? m 'generate)
      (if (null? args)
-         (random 1.0)
+         (random)
          (random (car args))))
     ((eq? m 'reset)
      (begin
-       (set! *random-state* (seed->random-state (car args)))
-       *random-state*))
+       (random-seed (car args))
+       (current-pseudo-random-generator)))
     (else (error "未知命令"))))
 
+(display (rand 'generate))
+(newline)
 (display (rand 'reset 0))
 (newline)
 (display (rand 'generate))
