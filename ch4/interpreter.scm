@@ -22,4 +22,21 @@
          (i-apply (i-eval (operator expr) env)
                   (list-of-values (operands expr) env)))
         (else
-          (error "Unknon expression type -- EVAL" expr))))
+          (i-error "Unknon expression type -- EVAL" expr))))
+
+(define (i-apply procedure arguments)
+  (cond ((primitive-procedure? procedure)
+         (apply-primitive-procedure procedure arguments))
+        ((compound-procedure? procedure)
+         (eval-sequence (procedure-body procedure)
+                        (extend-environment
+                          (procedure-arguments procedure)
+                          arguments
+                          (procedure-environment procedure))))
+        (else (i-error "Unknown procedure type -- APPLY" procedure))))
+
+(define (list-of-values exps env)
+  (i-if (no-operands? exps)
+        '()
+        (cons (i-eval (first-operand exps) env)
+              (list-of-values (rest-operands exps) env))))
