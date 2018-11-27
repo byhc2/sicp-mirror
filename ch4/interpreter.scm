@@ -2,7 +2,7 @@
 #lang scheme
 
 ; 为防止与解释器关键字冲突，修改部分过程名，参数名
-; 关键字、过程名一般加i-前缀，参数明基本随意
+; 关键字、过程名一般加i-前缀，参数名基本随意
 
 (define (i-eval expr env)
   (cond ((self-evaludating? expr) expr)
@@ -35,8 +35,45 @@
                           (procedure-environment procedure))))
         (else (i-error "Unknown procedure type -- APPLY" procedure))))
 
+;(define (list-of-values exps env)
+;  (i-if (no-operands? exps)
+;        '()
+;        (cons (i-eval (first-operand exps) env)
+;              (list-of-values (rest-operands exps) env))))
+; 习题 4.1
+; 使用let表达式
 (define (list-of-values exps env)
   (i-if (no-operands? exps)
         '()
-        (cons (i-eval (first-operand exps) env)
-              (list-of-values (rest-operands exps) env))))
+        (let (first-value (i-eval (first-operand exps) env))
+          (cons fist-value
+                (list-of-values (rest-operands exps) env)))))
+
+(define (list-of-values-r2l exps env)
+  (i-if (no-operands? exps)
+        '()
+        (let (last-value (list-of-values (rest-operands exps) env))
+          (cons (i-eval (first-operand exps) env)
+                last-value))))
+
+(define (eval-if expr env)
+  (if (true? (i-eval (if-predicate expr) env))
+      (i-eval (if-consequent expr) env)
+      (i-eval (if-alternative expr) env)))
+
+(define (eval-sequence expr env)
+  (cond ((last-exp? expr) (i-eval (first-exp expr) env))
+        (else (i-eval (first-exp expr) env)
+              (eval-sequence (rest-exps expr) env))))
+
+(define (eval-assignment expr env)
+  (set-variable-value! (assignment-variable expr)
+                       (i-eval (assignment-value expr) env)
+                       env)
+  'ok)
+
+(define (eval-definition expr env)
+  (define-variable! (definition-variable expr)
+                    (i-eval (definition-value expr) env)
+                    env)
+  'ok)
