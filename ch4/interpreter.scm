@@ -42,6 +42,7 @@
 ;              (list-of-values (rest-operands exps) env))))
 ; 习题 4.1
 ; 使用let表达式
+; 正常为从左到右，r2l为从右到左
 (define (list-of-values exps env)
   (i-if (no-operands? exps)
         '()
@@ -77,3 +78,23 @@
                     (i-eval (definition-value expr) env)
                     env)
   'ok)
+
+(define (self-evaludating? expr)
+  (cond ((number? expr) #t)
+        ((string? expr) #t)
+        (else #f)))
+
+(define (variable? expr) (symbol? expr))
+
+(define (quoted? expr) (tagged-list? expr 'quote))
+
+(define (text-of-quotation expr) (cadr expr))
+
+(define (tagged-list? expr tag)
+  (if (pair? expr)
+      (eq? (car expr) tag)
+      #f))
+
+(define (assignment? expr) (tagged-list? expr 'set!))
+(define (assignment-variable expr) (cadr expr))
+(define (assignment-value expr) (caddr expr))
