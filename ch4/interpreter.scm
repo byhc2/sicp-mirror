@@ -11,6 +11,8 @@
         ((assignment? expr) (eval-assignment expr env))
         ((definition? expr) (eval-definition expr env))
         ((if? expr) (eval-if expr env))
+        ((and? expr) (eval-and expr env #f))
+        ((or? expr) (eval-and expr env))
         ((lambda? expr)
          (make-procedure (lambda-parameters expr)
                          (lambda-body expr)
@@ -99,6 +101,41 @@
 (define (assignment-variable expr) (cadr expr))
 (define (assignment-value expr) (caddr expr))
 
+; 习题 4.4
+; 以递归实现
+(define (and? expr) (tagged-list? expr 'i-and))
+(define (or? expr) (tagged-list? expr 'i-or))
+(define (eval-and expr env)
+  (cond ((null? (cdr expr)) #t)
+        ((i-eval (cadr expr)) (eval-and (cdr expr) env))
+        (else #f)))
+(define (eval-or expr env)
+  (cond ((null? (cdr expr)) #f)
+        ((i-eval (cadr expr)) #t)
+        (else (eval-or (cdr expr) env))))
+; 派生表达式形式
+; 其实与递归差别不大
+(define (and->if expr)
+  (expand-parts (cdr expr)))
+(define (expand-and-parts parts)
+  (if (null? parts)
+      #t
+      (let ((first (car parts))
+            (rest (cdr parts)))
+        (make-if first
+            (expand-parts rest)
+            #f))))
+(define (or->if expr)
+  (expand-or-parts (cdr expr)))
+(define (expand-or-parts parts)
+  (if (null? parts)
+      #f
+      (let ((first (car parts))
+            (rest (cdr parts)))
+        (make-if first
+                 #t
+                 (expand-parts rest)))))
+
 (define (definition? expr) (tagged-list? expr 'define))
 (define (definition-variable expr)
   (if (symbol? (cadr expr))
@@ -137,6 +174,12 @@
 (define (make-begin seq) (cons 'begin seq))
 
 (define (application? expr) (pair? expr))
+; 习题 4.3
+; 将application?子句和definition?等同样处理
+; operator和operands也作相应修改
+; b) (define (application? expr) (tagged-list? expr 'call))
+; (define (operator epxr) (cadr expr))
+; (define (operands expr) (cddr expr))
 (define (operator expr) (car expr))
 (define (operands expr) (cdr expr))
 (define (no-operands ops) (null? ops))
@@ -167,3 +210,7 @@
             (make-if (cond-predicate first)
                      (sequence->expr (cond-actions first))
                      (expand-clauses rest))))))
+
+; 习题 4.3
+; a) 将application?子句前移，(define x 3)被application?子句处理
+; 作为函数，偿试在环境中寻找define函数，然后失败
