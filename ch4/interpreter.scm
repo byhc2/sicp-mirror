@@ -13,6 +13,7 @@
         ((if? expr) (eval-if expr env))
         ((and? expr) (eval-and expr env #f))
         ((or? expr) (eval-and expr env))
+        ((let? expr) (i-eval (let->combination expr) env))
         ((lambda? expr)
          (make-procedure (lambda-parameters expr)
                          (lambda-body expr)
@@ -25,6 +26,28 @@
                   (list-of-values (operands expr) env)))
         (else
           (i-error "Unknon expression type -- EVAL" expr))))
+
+; 习题 4.6
+; let-arguments和let-parameters尾递归不太好
+; 不知有没有迭代的方法？
+(define (let? expr) (tagged-list? expr 'let))
+(define (let-arguments expr)
+  (define (cons-list let-pair arg-list)
+    (if (null? let-pair)
+        arg-list
+        (cons (caar let-pair) (cons-list (cdr let-pair) arg-list))))
+  (cons-list (cdr expr) '()))
+(define (let-parameters expr)
+  (define (cons-list let-pair arg-list)
+    (if (null? let-pair)
+        arg-list
+        (cons (cadar let-pair) (cons-list (cdr let-pair) arg-list))))
+  (cons-list (cdr expr) '()))
+(define (let-body expr) (caddr expr))
+(define (let->combination expr)
+  (list 'lambda (let-arguments expr)
+        (let-parameters expr)
+        (let-body expr)))
 
 (define (i-apply procedure arguments)
   (cond ((primitive-procedure? procedure)
@@ -197,6 +220,12 @@
 (define (cond-actions clause) (cdr clause))
 (define (cond->if expr)
   (expand-clauses (cond-clauses expr)))
+; 习题 4.5
+; 另一种形势的cond
+(define (2nd-cond? expr)
+  (and
+    (eq? (car expr) '=>)
+    (not (null? (cdr expr)))))
 (define (expand-clauses clauses)
   (if (null? clauses)
       #f
@@ -207,9 +236,13 @@
                 (sequence->expr (cond-actions first))
                 (error "ELSE clause is not last -- COND->IF"
                        clauses))
-            (make-if (cond-predicate first)
-                     (sequence->expr (cond-actions first))
-                     (expand-clauses rest))))))
+            (if (2nd-cond? rest)
+                (make-if (cond-predicate first)
+                         (list (cadr rest) first)
+                         (expand-clauses rest))
+                (make-if (cond-predicate first)
+                         (sequence->expr (cond-actions first))
+                         (expand-clauses rest))))))
 
 ; 习题 4.3
 ; a) 将application?子句前移，(define x 3)被application?子句处理
