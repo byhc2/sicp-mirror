@@ -14,6 +14,7 @@
         ((and? expr) (eval-and expr env #f))
         ((or? expr) (eval-and expr env))
         ((let? expr) (i-eval (let->combination expr) env))
+        ((let*? expr) (i-eval (i-let*->nested-i-lets expr) env))
         ((lambda? expr)
          (make-procedure (lambda-parameters expr)
                          (lambda-body expr)
@@ -27,10 +28,31 @@
         (else
           (i-error "Unknon expression type -- EVAL" expr))))
 
+; 习题 4.7
+; let*每创建一个约束，都相当于在环境中创建了一个值
+; 后面的约束可以使用这个值，相当于在外层还有一个let
+; 所以可以将let*改写为嵌套的let
+; (let* ((arg1 v1) (arg2 v2) ... (argn vn)) <body>)
+; ==>
+; (let ((arg1 v1))
+;   (let* ((arg2 v2) ... (argn vn)) <body>))
+(define (let*? expr) (tagged-list? expr 'i-let*))
+(define (i-let*->nested-i-lets expr)
+  (let ((arg-parts (cadr expr))
+        (body-parts (caddr expr)))
+    (if (null? (cdr arg-parts))
+        (list 'i-let arg-parts body-parts)
+        (list 'i-let
+              (list (car arg-parts))
+              (i-let*->nested-i-lets
+                (list 'i-let*
+                      (cdr arg-parts)
+                      (body-parts)))))))
+
 ; 习题 4.6
 ; let-arguments和let-parameters尾递归不太好
 ; 不知有没有迭代的方法？
-(define (let? expr) (tagged-list? expr 'let))
+(define (let? expr) (tagged-list? expr 'i-let))
 (define (let-arguments expr)
   (define (cons-list let-pair arg-list)
     (if (null? let-pair)
@@ -44,10 +66,17 @@
         (cons (cadar let-pair) (cons-list (cdr let-pair) arg-list))))
   (cons-list (cdr expr) '()))
 (define (let-body expr) (caddr expr))
+; 习题 4.8
+; 普通let形式(i-let ((arg1 v1) ... (argn vn)) <body>)
+; 命名let形式(let <name> ((arg1 v1) ... (argn vn)) <body>)
+(define (make-named-let-lambda expr)
+  )
 (define (let->combination expr)
-  (list 'lambda (let-arguments expr)
-        (let-parameters expr)
-        (let-body expr)))
+  (if (list? (cadr expr))
+      (list 'lambda (let-arguments expr)
+            (let-parameters expr)
+            (let-body expr))
+      (make-named-let-lambda expr)))
 
 (define (i-apply procedure arguments)
   (cond ((primitive-procedure? procedure)
