@@ -1,6 +1,8 @@
 #!/usr/bin/racket
 #lang scheme
 
+(provide i-eval)
+
 ; 为防止与解释器关键字冲突，修改部分过程名，参数名
 ; 关键字、过程名一般加i-前缀，参数名基本随意
 
@@ -271,7 +273,7 @@
                          (expand-clauses rest))
                 (make-if (cond-predicate first)
                          (sequence->expr (cond-actions first))
-                         (expand-clauses rest))))))
+                         (expand-clauses rest)))))))
 
 ; 习题 4.3
 ; a) 将application?子句前移，(define x 3)被application?子句处理
