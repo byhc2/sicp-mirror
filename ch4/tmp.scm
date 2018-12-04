@@ -1,11 +1,12 @@
 #!/usr/bin/racket
 #lang scheme
 
-(define (fun p)
-  (cond ((eq? p #t) (display 'xxxxx))
-        (else (display 'yyyyy)
-              (newline)
-              (display 'zzzzzz))))
+(define (fun x)
+  (if (> x 0)
+      (begin
+        (display x)
+        (newline)
+        (fun (- x 1)))
+      (newline)))
 
-(fun #f)
-(newline)
+(fun 20)

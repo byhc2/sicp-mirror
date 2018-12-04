@@ -71,13 +71,33 @@
 ; 习题 4.8
 ; 普通let形式(i-let ((arg1 v1) ... (argn vn)) <body>)
 ; 命名let形式(let <name> ((arg1 v1) ... (argn vn)) <body>)
+; 应该只能定义命名函数，然后调用之
+; 故需要两条语句组合，宜用sequence-epxr
+(define (named-let-arguments expr)
+  (define (cons-list pairs ret)
+    (if (null? pairs)
+        ret
+        (cons-list (cdr pairs) (cons (caar pairs) ret))))
+  (cons-list (caddr expr) '()))
+(define (named-let-parameters expr)
+  (define (cons-list pairs ret)
+    (if (null? pairs)
+        ret
+        (cons-list (cdr pairs) (cons (cadar pairs) ret))))
+  (cons-list (caddr expr) '()))
 (define (make-named-let-lambda expr)
-  )
-(define (let->combination expr)
-  (if (list? (cadr expr))
-      (list 'lambda (let-arguments expr)
-            (let-parameters expr)
+  (let ((fun-name (cadr expr)))
+    (sequence-expr
+      (list 'define (cons fun-name (named-let-arguments expr))
             (let-body expr))
+      (fun-name named-let-parameters expr))))
+(define (not-named-let? expr)
+  (list? (cadr expr)))
+(define (let->combination expr)
+  (if (not-named-let? expr)
+      (list 'lambda (let-arguments expr)
+            (let-body expr)
+            (let-parameters expr))
       (make-named-let-lambda expr)))
 
 (define (i-apply procedure arguments)
@@ -278,3 +298,7 @@
 ; 习题 4.3
 ; a) 将application?子句前移，(define x 3)被application?子句处理
 ; 作为函数，偿试在环境中寻找define函数，然后失败
+
+; 习题 4.9
+; 例如：(while <predicate> <body>)
+; 当predicate为真时，反复执行body
