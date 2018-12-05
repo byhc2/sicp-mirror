@@ -15,6 +15,7 @@
         ((if? expr) (eval-if expr env))
         ((and? expr) (eval-and expr env #f))
         ((or? expr) (eval-and expr env))
+        ((while? expr) (i-eval (while->iter expr) env))
         ((let? expr) (i-eval (let->combination expr) env))
         ((let*? expr) (i-eval (i-let*->nested-i-lets expr) env))
         ((lambda? expr)
@@ -87,10 +88,10 @@
   (cons-list (caddr expr) '()))
 (define (make-named-let-lambda expr)
   (let ((fun-name (cadr expr)))
-    (sequence-expr
-      (list 'define (cons fun-name (named-let-arguments expr))
-            (let-body expr))
-      (fun-name named-let-parameters expr))))
+    (sequence->expr
+      (list (list 'define (cons fun-name (named-let-arguments expr))
+                  (let-body expr))
+            (fun-name named-let-parameters expr)))))
 (define (not-named-let? expr)
   (list? (cadr expr)))
 (define (let->combination expr)
@@ -295,6 +296,11 @@
                          (sequence->expr (cond-actions first))
                          (expand-clauses rest)))))))
 
+(define (true? x)
+  (not (eq? x #f)))
+(define (false? x)
+  (eq? x #f))
+
 ; 习题 4.3
 ; a) 将application?子句前移，(define x 3)被application?子句处理
 ; 作为函数，偿试在环境中寻找define函数，然后失败
@@ -302,3 +308,12 @@
 ; 习题 4.9
 ; 例如：(while <predicate> <body>)
 ; 当predicate为真时，反复执行body
+(define (while? (tagged-list? expr) 'while))
+(define (while->iter expr)
+  (let ((predicate (cadr expr))
+        (body (caddr expr)))
+    (if (i-eval predicate)
+        (make-lambda '() (sequence->expr
+                           (list body (list 'while predicate body)))))))
+
+; 习题 4.10 暂略
